@@ -204,10 +204,16 @@ def main() -> None:
     kernel_suffix = kernel_cmp_orig[kend:]
 
     fitted_kernel_gz = fit_gzip_to_exact_length(vmlinux_patched, kernel_stream_len)
-    if fitted_kernel_gz is None:
-        min_len = len(gz_compress(vmlinux_patched))
+if fitted_kernel_gz is None:
+    min_len = len(gz_compress(vmlinux_patched))
+    diff = kernel_stream_len - min_len
+    if 0 < diff < 8192:
+        print(f"[!] Warning: recompressed kernel {diff} bytes smaller — padding with zeros.")
+        fitted_kernel_gz = gz_compress(vmlinux_patched)
+        fitted_kernel_gz += b"\x00" * diff
+    else:
         die(f"Recompressed vmlinux cannot fit original kernel stream size: minimal {min_len} > {kernel_stream_len}")
-
+        
     kernel_cmp_patched = kernel_prefix + fitted_kernel_gz + kernel_suffix
     assert len(kernel_cmp_patched) == len(kernel_cmp_orig), "kernel.cmp size changed"
     (outdir / "kernel.cmp.patched").write_bytes(kernel_cmp_patched)
