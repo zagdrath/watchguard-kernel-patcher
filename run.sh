@@ -7,7 +7,7 @@
 #   4) Rebuilds the bzImage with the patches
 #
 
-python extract_bzimage.py
-python patch_codeverf.py
-python repack_initramfs.py # --prefer-zopfli (try this if getting a size mismatch)
-python repack_bzimage.py
+python3 extract_bzimage.py
+python3 patch_codeverf.py
+python3 repack_initramfs.py # --prefer-zopfli (try this if getting a size mismatch)
+python3 repack_bzimage.py
